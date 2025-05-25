@@ -1,10 +1,10 @@
 // src/api/api.js
 
 const Projects_URL = 'https://nguyenminhtam.onrender.com/api/Projects'; // Địa chỉ API của bạn
-
+const Projects_URL_2 = 'https://localhost:7218/api/Projects'; // Địa chỉ API của bạn
 export const fetchProjects = async () => {
     try {
-        const response = await fetch(Projects_URL);
+        const response = await fetch(Projects_URL_2);
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
