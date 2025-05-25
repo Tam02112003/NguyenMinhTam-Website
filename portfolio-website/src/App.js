@@ -1,6 +1,7 @@
 import Header from './components/Header/Header';
 import HeroSection from './components/HeroSection/HeroSection';
 import BodySection from './components/BodySection/BodySection';
+import Footer from './components/Footer/Footer';
 import './App.css';
 
 function App() {
@@ -9,6 +10,7 @@ function App() {
       <Header />
       <HeroSection />
       <BodySection />
+       <Footer />
       {/* Other sections will be added here */}
     </div>
   );
