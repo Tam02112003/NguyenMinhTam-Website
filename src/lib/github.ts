@@ -30,7 +30,10 @@ export async function getRepos(username: string): Promise<Repo[]> {
   const data: GitHubRepo[] = await res.json();
 
   return data
-    .filter((repo) => !repo.fork && !excludedRepos.has(repo.name))
+    .filter(
+      (repo) =>
+        !repo.fork && !excludedRepos.has(repo.name) && Boolean(repo.description)
+    )
     .map((repo) => ({
       name: repo.name,
       description: repo.description,

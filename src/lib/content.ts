@@ -74,4 +74,12 @@ export const excludedRepos = new Set([
   "CRUD-in-Java",
   "CRUDValidationJAVA",
   "N4_21DTHB4",
+  "First-Deploy-Token",
+  "TDT-training-frontend",
+  "TDTASIA_Training",
+  "Website-Management-Hotel",
+  "Backend-Financial",
+  "Python_co_ban",
+  "Webbantruyen_DAPHP_Nhom6",
+  "Back-end-Websitecanhan",
 ]);
