@@ -4,19 +4,24 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
 const SPRITE_SIZE = 64;
-const SPEED = 50; // px per second
+const SPEED = 70; // px per second
+const FRAME_COUNT = 8;
+const FRAME_DURATION = 200; // ms, matches source run-cycle gif
 const JUMP_DURATION = 500; // ms
 
 export default function WalkingSprite() {
   const [x, setX] = useState(0);
   const [direction, setDirection] = useState<"east" | "west">("east");
+  const [frame, setFrame] = useState(0);
   const [jumping, setJumping] = useState(false);
   const [ready, setReady] = useState(false);
+
   const directionRef = useRef<"east" | "west">("east");
   const xRef = useRef(0);
   const rafRef = useRef<number | null>(null);
   const jumpTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const nextAutoJumpRef = useRef(0);
+  const lastFrameChangeRef = useRef(0);
 
   const doJump = useCallback(() => {
     setJumping(true);
@@ -29,6 +34,7 @@ export default function WalkingSprite() {
 
     setReady(true);
     let lastTime = performance.now();
+    lastFrameChangeRef.current = lastTime;
     nextAutoJumpRef.current = lastTime + 3000 + Math.random() * 4000;
 
     function tick(now: number) {
@@ -52,6 +58,11 @@ export default function WalkingSprite() {
       xRef.current = nextX;
       setX(nextX);
 
+      if (now - lastFrameChangeRef.current >= FRAME_DURATION) {
+        lastFrameChangeRef.current = now;
+        setFrame((f) => (f + 1) % FRAME_COUNT);
+      }
+
       if (now >= nextAutoJumpRef.current) {
         doJump();
         nextAutoJumpRef.current = now + 3000 + Math.random() * 5000;
@@ -69,6 +80,8 @@ export default function WalkingSprite() {
 
   if (!ready) return null;
 
+  const frameName = `frame_${String(frame).padStart(2, "0")}`;
+
   return (
     <div
       className="fixed bottom-4 z-40 cursor-pointer select-none"
@@ -78,21 +91,17 @@ export default function WalkingSprite() {
       aria-label="Nhấn để nhân vật nhảy"
       title="Click me!"
     >
-      <div
-        className={
-          jumping
-            ? "animate-[jump_0.5s_ease-out]"
-            : "animate-[bob_0.6s_ease-in-out_infinite_alternate]"
-        }
-      >
-        <Image
-          src={`/pixel-avatar/walk-${direction}.png`}
-          alt=""
-          width={SPRITE_SIZE}
-          height={SPRITE_SIZE}
-          className="[image-rendering:pixelated]"
-          priority
-        />
+      <div className={jumping ? "animate-[jump_0.5s_ease-out]" : ""}>
+        <div style={{ transform: direction === "west" ? "scaleX(-1)" : undefined }}>
+          <Image
+            src={`/pixel-avatar/run/${frameName}.png`}
+            alt=""
+            width={SPRITE_SIZE}
+            height={SPRITE_SIZE}
+            className="[image-rendering:pixelated]"
+            priority
+          />
+        </div>
       </div>
     </div>
   );
