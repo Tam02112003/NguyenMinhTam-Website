@@ -5,8 +5,9 @@ import Image from "next/image";
 
 const SPRITE_SIZE = 64;
 const SPEED = 70; // px per second
-const FRAME_COUNT = 6;
-const FRAME_DURATION = 200; // ms, matches source run-cycle gif
+const RUN_FRAME_COUNT = 6;
+const WAVE_FRAME_COUNT = 9;
+const FRAME_DURATION = 200; // ms, matches source gifs
 const JUMP_DURATION = 500; // ms
 
 export default function WalkingSprite() {
@@ -64,6 +65,11 @@ export default function WalkingSprite() {
       const dt = (now - lastTime) / 1000;
       lastTime = now;
 
+      if (now - lastFrameChangeRef.current >= FRAME_DURATION) {
+        lastFrameChangeRef.current = now;
+        setFrame((f) => f + 1);
+      }
+
       if (wavingRef.current) {
         rafRef.current = requestAnimationFrame(tick);
         return;
@@ -86,11 +92,6 @@ export default function WalkingSprite() {
       xRef.current = nextX;
       setX(nextX);
 
-      if (now - lastFrameChangeRef.current >= FRAME_DURATION) {
-        lastFrameChangeRef.current = now;
-        setFrame((f) => (f + 1) % FRAME_COUNT);
-      }
-
       if (now >= nextAutoJumpRef.current) {
         doJump();
         nextAutoJumpRef.current = now + 3000 + Math.random() * 5000;
@@ -108,13 +109,18 @@ export default function WalkingSprite() {
 
   if (!ready) return null;
 
-  const frameName = `frame_${String(frame).padStart(2, "0")}`;
+  const frameName = waving
+    ? `frame_${String(frame % WAVE_FRAME_COUNT).padStart(2, "0")}`
+    : `frame_${String(frame % RUN_FRAME_COUNT).padStart(2, "0")}`;
+  const src = waving ? `/pixel-avatar/wave/${frameName}.png` : `/pixel-avatar/run/${frameName}.png`;
 
   return (
     <div
       className="fixed bottom-4 z-40 cursor-pointer select-none"
       style={{ left: x, width: SPRITE_SIZE, height: SPRITE_SIZE }}
-      onClick={doJump}
+      onClick={() => {
+        if (!waving) doJump();
+      }}
       role="button"
       aria-label="Nhấn để nhân vật nhảy"
       title="Click me!"
@@ -122,7 +128,7 @@ export default function WalkingSprite() {
       <div className={!waving && jumping ? "animate-[jump_0.5s_ease-out]" : ""}>
         <div style={{ transform: !waving && direction === "west" ? "scaleX(-1)" : undefined }}>
           <Image
-            src={waving ? "/pixel-avatar/wave-south.png" : `/pixel-avatar/run/${frameName}.png`}
+            src={src}
             alt=""
             width={SPRITE_SIZE}
             height={SPRITE_SIZE}
