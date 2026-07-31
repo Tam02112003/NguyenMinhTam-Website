@@ -1,0 +1,85 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #0b0e14;
+  --bg-elevated: #10141d;
+  --border: #1f2937;
+  --fg: #d1d5db;
+  --fg-dim: #6b7280;
+  --accent: #39ff88;
+  --accent-dim: #1f8f4d;
+  --amber: #ffb454;
+  --pink: #ff6ac1;
+  --cyan: #5ccfe6;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-border: var(--border);
+  --color-fg: var(--fg);
+  --color-fg-dim: var(--fg-dim);
+  --color-accent: var(--accent);
+  --color-accent-dim: var(--accent-dim);
+  --color-amber: var(--amber);
+  --color-pink: var(--pink);
+  --color-cyan: var(--cyan);
+  --font-mono: var(--font-jetbrains-mono);
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.terminal-window {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  box-shadow: 0 20px 60px -20px rgba(0, 0, 0, 0.6);
+}
+
+.terminal-dot {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 9999px;
+  display: inline-block;
+}
+
+.blink-cursor::after {
+  content: "▌";
+  margin-left: 2px;
+  animation: blink 1s steps(1) infinite;
+  color: var(--accent);
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.scanline-glow {
+  text-shadow: 0 0 12px rgba(57, 255, 136, 0.35);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 9999px;
+}

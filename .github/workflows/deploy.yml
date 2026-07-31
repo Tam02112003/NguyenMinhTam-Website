@@ -1,0 +1,40 @@
+name: Deploy to production
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy portfolio via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            set -e
+            exec 200>/tmp/medi247-deploy.lock
+            flock -x -w 900 200 || { echo "Could not acquire deploy lock (another deploy running too long)"; exit 1; }
+            cd ~/medi247/portfolio-website
+            git fetch origin main
+            git reset --hard origin/main
+            cd ~/medi247/medi247-ai-assistant
+            docker compose build --no-cache portfolio
+            docker compose up -d portfolio
+            docker image prune -f
+
+            for i in $(seq 1 40); do
+              code=$(curl -sk -o /dev/null -w '%{http_code}' -H "Host: portfolio.tamnguyen.asia" https://localhost/ || echo 000)
+              if [ "$code" = "200" ]; then
+                echo "Portfolio healthy (HTTP $code)"
+                exit 0
+              fi
+              echo "Waiting for portfolio... ($i/40, last HTTP code=$code)"
+              sleep 5
+            done
+            echo "Portfolio did not become healthy in time"
+            docker compose logs portfolio --tail 100
+            exit 1
