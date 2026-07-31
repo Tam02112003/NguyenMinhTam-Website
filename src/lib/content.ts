@@ -5,7 +5,7 @@ export const profile = {
   location: "Ho Chi Minh City, Vietnam",
   email: "ngminhtam021103@gmail.com",
   github: "https://github.com/Tam02112003",
-  bio: "Backend Developer đang theo học Kỹ thuật Phần mềm tại Đại học Bách Khoa TP.HCM. Thích xây dựng các hệ thống chạy được thật sự, từ backend Java/Spring đến các dịch vụ AI/chatbot bằng Python, và luôn tò mò với công nghệ mới.",
+  bio: "Backend Developer đang theo học Kỹ thuật Phần mềm tại HUTECH (Đại học Công nghệ TP.HCM). Thích xây dựng các hệ thống chạy được thật sự, từ backend Java/Spring đến các dịch vụ AI/chatbot bằng Python, và luôn tò mò với công nghệ mới.",
 };
 
 export const skills = {
@@ -48,7 +48,7 @@ export const timeline: TimelineEntry[] = [
   {
     kind: "education",
     title: "Software Engineering",
-    org: "Ho Chi Minh City University of Technology — Faculty of Information Technology",
+    org: "HUTECH (Ho Chi Minh City University of Technology) — Faculty of Information Technology",
     period: "09/2021 — 09/2025",
     detail: "Good Academic Performance.",
   },
