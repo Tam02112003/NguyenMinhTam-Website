@@ -5,7 +5,7 @@ export const profile = {
   location: "Ho Chi Minh City, Vietnam",
   email: "ngminhtam021103@gmail.com",
   github: "https://github.com/Tam02112003",
-  bio: "Backend Developer đang theo học Kỹ thuật Phần mềm tại HUTECH (Đại học Công nghệ TP.HCM). Thích xây dựng các hệ thống chạy được thật sự, từ backend Java/Spring đến các dịch vụ AI/chatbot bằng Python, và luôn tò mò với công nghệ mới.",
+  bio: "Backend Developer tốt nghiệp ngành Kỹ thuật Phần mềm tại HUTECH (Đại học Công nghệ TP.HCM). Thích xây dựng các hệ thống chạy được thật sự, từ backend Java/Spring đến các dịch vụ AI/chatbot bằng Python, và luôn tò mò với công nghệ mới.",
 };
 
 export const skills = {
