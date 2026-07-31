@@ -5,7 +5,7 @@ import Image from "next/image";
 
 const SPRITE_SIZE = 64;
 const SPEED = 70; // px per second
-const FRAME_COUNT = 8;
+const FRAME_COUNT = 6;
 const FRAME_DURATION = 200; // ms, matches source run-cycle gif
 const JUMP_DURATION = 500; // ms
 
