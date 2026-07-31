@@ -14,6 +14,7 @@ export default function WalkingSprite() {
   const [direction, setDirection] = useState<"east" | "west">("east");
   const [frame, setFrame] = useState(0);
   const [jumping, setJumping] = useState(false);
+  const [waving, setWaving] = useState(false);
   const [ready, setReady] = useState(false);
 
   const directionRef = useRef<"east" | "west">("east");
@@ -22,11 +23,33 @@ export default function WalkingSprite() {
   const jumpTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const nextAutoJumpRef = useRef(0);
   const lastFrameChangeRef = useRef(0);
+  const wavingRef = useRef(false);
 
   const doJump = useCallback(() => {
     setJumping(true);
     if (jumpTimeoutRef.current) clearTimeout(jumpTimeoutRef.current);
     jumpTimeoutRef.current = setTimeout(() => setJumping(false), JUMP_DURATION);
+  }, []);
+
+  useEffect(() => {
+    const contactEl = document.getElementById("contact");
+    if (!contactEl) return;
+
+    function onEnter() {
+      wavingRef.current = true;
+      setWaving(true);
+    }
+    function onLeave() {
+      wavingRef.current = false;
+      setWaving(false);
+    }
+
+    contactEl.addEventListener("mouseenter", onEnter);
+    contactEl.addEventListener("mouseleave", onLeave);
+    return () => {
+      contactEl.removeEventListener("mouseenter", onEnter);
+      contactEl.removeEventListener("mouseleave", onLeave);
+    };
   }, []);
 
   useEffect(() => {
@@ -40,6 +63,11 @@ export default function WalkingSprite() {
     function tick(now: number) {
       const dt = (now - lastTime) / 1000;
       lastTime = now;
+
+      if (wavingRef.current) {
+        rafRef.current = requestAnimationFrame(tick);
+        return;
+      }
 
       const maxX = window.innerWidth - SPRITE_SIZE;
       let nextX =
@@ -91,10 +119,10 @@ export default function WalkingSprite() {
       aria-label="Nhấn để nhân vật nhảy"
       title="Click me!"
     >
-      <div className={jumping ? "animate-[jump_0.5s_ease-out]" : ""}>
-        <div style={{ transform: direction === "west" ? "scaleX(-1)" : undefined }}>
+      <div className={!waving && jumping ? "animate-[jump_0.5s_ease-out]" : ""}>
+        <div style={{ transform: !waving && direction === "west" ? "scaleX(-1)" : undefined }}>
           <Image
-            src={`/pixel-avatar/run/${frameName}.png`}
+            src={waving ? "/pixel-avatar/wave-south.png" : `/pixel-avatar/run/${frameName}.png`}
             alt=""
             width={SPRITE_SIZE}
             height={SPRITE_SIZE}
