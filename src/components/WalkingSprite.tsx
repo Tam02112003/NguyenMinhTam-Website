@@ -9,12 +9,13 @@ const RUN_FRAME_COUNT = 6;
 const FRAME_DURATION = 200; // ms, matches source gifs
 const JUMP_DURATION = 500; // ms
 
-type InteractionName = "wave" | "pickup" | "drink";
+type InteractionName = "wave" | "pickup" | "drink" | "getup";
 
 const INTERACTIONS: Record<InteractionName, { elementId: string; frameCount: number }> = {
   wave: { elementId: "contact", frameCount: 9 },
   pickup: { elementId: "projects", frameCount: 9 },
   drink: { elementId: "about", frameCount: 9 },
+  getup: { elementId: "experience", frameCount: 9 },
 };
 
 export default function WalkingSprite() {
