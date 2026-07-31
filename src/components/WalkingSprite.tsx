@@ -6,16 +6,22 @@ import Image from "next/image";
 const SPRITE_SIZE = 64;
 const SPEED = 70; // px per second
 const RUN_FRAME_COUNT = 6;
-const WAVE_FRAME_COUNT = 9;
 const FRAME_DURATION = 200; // ms, matches source gifs
 const JUMP_DURATION = 500; // ms
+
+type InteractionName = "wave" | "pickup";
+
+const INTERACTIONS: Record<InteractionName, { elementId: string; frameCount: number }> = {
+  wave: { elementId: "contact", frameCount: 9 },
+  pickup: { elementId: "projects", frameCount: 9 },
+};
 
 export default function WalkingSprite() {
   const [x, setX] = useState(0);
   const [direction, setDirection] = useState<"east" | "west">("east");
   const [frame, setFrame] = useState(0);
   const [jumping, setJumping] = useState(false);
-  const [waving, setWaving] = useState(false);
+  const [interaction, setInteraction] = useState<InteractionName | null>(null);
   const [ready, setReady] = useState(false);
 
   const directionRef = useRef<"east" | "west">("east");
@@ -24,7 +30,7 @@ export default function WalkingSprite() {
   const jumpTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const nextAutoJumpRef = useRef(0);
   const lastFrameChangeRef = useRef(0);
-  const wavingRef = useRef(false);
+  const interactionRef = useRef<InteractionName | null>(null);
 
   const doJump = useCallback(() => {
     setJumping(true);
@@ -33,24 +39,32 @@ export default function WalkingSprite() {
   }, []);
 
   useEffect(() => {
-    const contactEl = document.getElementById("contact");
-    if (!contactEl) return;
+    const cleanups: Array<() => void> = [];
 
-    function onEnter() {
-      wavingRef.current = true;
-      setWaving(true);
-    }
-    function onLeave() {
-      wavingRef.current = false;
-      setWaving(false);
-    }
+    (Object.keys(INTERACTIONS) as InteractionName[]).forEach((name) => {
+      const el = document.getElementById(INTERACTIONS[name].elementId);
+      if (!el) return;
 
-    contactEl.addEventListener("mouseenter", onEnter);
-    contactEl.addEventListener("mouseleave", onLeave);
-    return () => {
-      contactEl.removeEventListener("mouseenter", onEnter);
-      contactEl.removeEventListener("mouseleave", onLeave);
-    };
+      function onEnter() {
+        interactionRef.current = name;
+        setInteraction(name);
+      }
+      function onLeave() {
+        if (interactionRef.current === name) {
+          interactionRef.current = null;
+          setInteraction(null);
+        }
+      }
+
+      el.addEventListener("mouseenter", onEnter);
+      el.addEventListener("mouseleave", onLeave);
+      cleanups.push(() => {
+        el.removeEventListener("mouseenter", onEnter);
+        el.removeEventListener("mouseleave", onLeave);
+      });
+    });
+
+    return () => cleanups.forEach((fn) => fn());
   }, []);
 
   useEffect(() => {
@@ -70,7 +84,7 @@ export default function WalkingSprite() {
         setFrame((f) => f + 1);
       }
 
-      if (wavingRef.current) {
+      if (interactionRef.current) {
         rafRef.current = requestAnimationFrame(tick);
         return;
       }
@@ -109,24 +123,29 @@ export default function WalkingSprite() {
 
   if (!ready) return null;
 
-  const frameName = waving
-    ? `frame_${String(frame % WAVE_FRAME_COUNT).padStart(2, "0")}`
-    : `frame_${String(frame % RUN_FRAME_COUNT).padStart(2, "0")}`;
-  const src = waving ? `/pixel-avatar/wave/${frameName}.png` : `/pixel-avatar/run/${frameName}.png`;
+  const src = interaction
+    ? `/pixel-avatar/${interaction}/frame_${String(
+        frame % INTERACTIONS[interaction].frameCount
+      ).padStart(2, "0")}.png`
+    : `/pixel-avatar/run/frame_${String(frame % RUN_FRAME_COUNT).padStart(2, "0")}.png`;
 
   return (
     <div
       className="fixed bottom-4 z-40 cursor-pointer select-none"
       style={{ left: x, width: SPRITE_SIZE, height: SPRITE_SIZE }}
       onClick={() => {
-        if (!waving) doJump();
+        if (!interaction) doJump();
       }}
       role="button"
       aria-label="Nhấn để nhân vật nhảy"
       title="Click me!"
     >
-      <div className={!waving && jumping ? "animate-[jump_0.5s_ease-out]" : ""}>
-        <div style={{ transform: !waving && direction === "west" ? "scaleX(-1)" : undefined }}>
+      <div className={!interaction && jumping ? "animate-[jump_0.5s_ease-out]" : ""}>
+        <div
+          style={{
+            transform: !interaction && direction === "west" ? "scaleX(-1)" : undefined,
+          }}
+        >
           <Image
             src={src}
             alt=""
