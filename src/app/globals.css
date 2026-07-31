@@ -69,6 +69,33 @@ body {
   }
 }
 
+@keyframes bob {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes jump {
+  0% {
+    transform: translateY(0) scaleY(1);
+  }
+  20% {
+    transform: translateY(2px) scaleY(0.9);
+  }
+  50% {
+    transform: translateY(-36px) scaleY(1.05);
+  }
+  80% {
+    transform: translateY(2px) scaleY(0.95);
+  }
+  100% {
+    transform: translateY(0) scaleY(1);
+  }
+}
+
 .scanline-glow {
   text-shadow: 0 0 12px rgba(57, 255, 136, 0.35);
 }
